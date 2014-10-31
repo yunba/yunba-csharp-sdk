@@ -9,7 +9,7 @@ namespace MqttLib.Core.Messages
         /// <summary>
         /// The version of the MQTT protocol we are using
         /// </summary>
-        private const byte VERSION = 3;
+        private const byte VERSION = 0x13;
 
         private ushort _keepAlive;
         private byte[] _clientID;

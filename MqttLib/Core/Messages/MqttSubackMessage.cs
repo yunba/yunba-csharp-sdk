@@ -17,8 +17,8 @@ namespace MqttLib.Core.Messages
         protected override void ConstructFromStream(System.IO.Stream str)
         {
             // Read the message ID that the server is acknowlodging
-            _ackID = ReadUshortFromStream(str);
-            int qosCount = variableHeaderLength - 2;
+            _ackID = ReadUlongFromStream(str);
+            int qosCount = variableHeaderLength - 8;
             grantedQos = new QoS[qosCount];
 
             for (int i = 0; i < qosCount; i++)

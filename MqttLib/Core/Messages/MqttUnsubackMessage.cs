@@ -15,7 +15,7 @@ namespace MqttLib.Core.Messages
 
         protected override void ConstructFromStream(System.IO.Stream str)
         {
-            _ackID = ReadUshortFromStream(str);
+            _ackID = ReadUlongFromStream(str);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace MqttLib.Core.Messages
 
         private string[] _topics;
 
-        public MqttUnsubscribeMessage(ushort messageID, string[] topics) : base(MessageType.UNSUBSCRIBE)
+        public MqttUnsubscribeMessage(ulong messageID, string[] topics) : base(MessageType.UNSUBSCRIBE)
         {
             _messageID = messageID;
             _topics = topics;
@@ -20,7 +20,7 @@ namespace MqttLib.Core.Messages
             {
                 payloadLength += (2 + GetUTF8StringLength(topic));
             }
-            variableHeaderLength = 2 + payloadLength;
+            variableHeaderLength = 8 + payloadLength;
 
         }
 

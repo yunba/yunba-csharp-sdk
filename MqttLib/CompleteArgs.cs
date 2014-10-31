@@ -9,13 +9,13 @@ namespace MqttLib
 
     #region Member Variables
 
-    private int _messageID;
+      private ulong _messageID;
 
     #endregion
 
     #region Constructors
 
-    public CompleteArgs(int messageID)
+      public CompleteArgs(ulong messageID)
     {
       _messageID = messageID;
     }
@@ -27,13 +27,13 @@ namespace MqttLib
     /// <summary>
     /// ID of the message
     /// </summary>
-    public int MessageID
-    {
-      get
+      public ulong MessageID
       {
-        return _messageID;
+          get
+          {
+              return _messageID;
+          }
       }
-    }
 
     #endregion
   }

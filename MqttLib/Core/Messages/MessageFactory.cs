@@ -40,6 +40,8 @@ namespace MqttLib.Core.Messages
                     return new MqttUnsubackMessage(str, header);
                 case MessageType.PINGRESP:
                     return new MqttPingRespMessage(str, header);
+                case MessageType.EXTENDEDACK:
+                    return new MqttExtendedackMessage(str, header);
                 case MessageType.UNSUBSCRIBE:
                 case MessageType.CONNECT:
                 

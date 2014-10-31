@@ -9,7 +9,7 @@ namespace MqttLib.Core.Messages
       private string _topic;
       private byte[] _payload;
 
-      public MqttPublishMessage( ushort id, string topic, byte[] payload, QoS qos, bool retained )
+      public MqttPublishMessage( ulong id, string topic, byte[] payload, QoS qos, bool retained )
         : base(MessageType.PUBLISH)
       {
         _topic = topic;
@@ -21,7 +21,7 @@ namespace MqttLib.Core.Messages
 
         base.variableHeaderLength =
           2 + GetUTF8StringLength(topic) +    // Topic + length
-          (qos == QoS.BestEfforts ? 0 : 2) +  // Message ID for QoS > 0
+          (qos == QoS.BestEfforts ? 0 : 8) +  // Message ID for QoS > 0
           payload.Length;                     // Message Payload
       }
 
@@ -42,8 +42,8 @@ namespace MqttLib.Core.Messages
         payloadLen -= (GetUTF8StringLength(_topic) + 2);
 
         if (msgQos != QoS.BestEfforts) {
-          _messageID = ReadUshortFromStream(str);
-          payloadLen -= 2;
+          _messageID = ReadUlongFromStream(str);
+          payloadLen -= 8;
         }
 
         _payload = new byte[payloadLen];

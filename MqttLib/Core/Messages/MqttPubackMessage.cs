@@ -8,7 +8,7 @@ namespace MqttLib.Core.Messages
     internal class MqttPubackMessage : MqttAcknowledgeMessage
     {
 
-        public MqttPubackMessage(ushort ackID) : base(MessageType.PUBACK, 2, ackID)
+        public MqttPubackMessage(ulong ackID) : base(MessageType.PUBACK, 8, ackID)
         {
             // Nothing to construct
         }
@@ -20,7 +20,7 @@ namespace MqttLib.Core.Messages
 
         protected override void ConstructFromStream(System.IO.Stream str)
         {
-            _ackID = ReadUshortFromStream(str);
+            _ackID = ReadUlongFromStream(str);
         }
 
         protected override void SendPayload(Stream str)

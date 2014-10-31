@@ -6,9 +6,9 @@ namespace MqttLib.Core.Messages
 {
     internal class MqttPubrecMessage : MqttMessage
     {
-        private ushort _ackID;
+        private ulong _ackID;
 
-        public ushort AckID
+        public ulong AckID
         {
             get
             {
@@ -16,7 +16,8 @@ namespace MqttLib.Core.Messages
             }
         }
 
-        public MqttPubrecMessage(ushort ackID) : base(MessageType.PUBREC, 2)
+        public MqttPubrecMessage(ulong ackID)
+            : base(MessageType.PUBREC, 8)
         {
             _ackID = ackID;
             // Ensure that this message will be re-sent unless acknowledged
@@ -31,7 +32,7 @@ namespace MqttLib.Core.Messages
 
         protected override void ConstructFromStream(System.IO.Stream str)
         {
-            _ackID = ReadUshortFromStream(str);
+            _ackID = ReadUlongFromStream(str);
         }
 
         protected override void SendPayload(Stream str)

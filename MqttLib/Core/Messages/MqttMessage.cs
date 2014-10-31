@@ -22,7 +22,8 @@ namespace MqttLib.Core.Messages
 	     UNSUBACK 		= 11,
 	     PINGREQ 		= 12,
 	     PINGRESP 		= 13,
-	     DISCONNECT 	= 14
+	     DISCONNECT 	= 14,
+         EXTENDEDACK    = 15
     }
 
     internal abstract class MqttMessage : MqttLib.Core.Messages.IPersitentMessage
@@ -35,7 +36,7 @@ namespace MqttLib.Core.Messages
 
         
         protected bool isRetained = false;
-        protected ushort _messageID = 0;
+        protected ulong _messageID = 0;
         private long _timestamp;
 
         public long Timestamp
@@ -61,7 +62,7 @@ namespace MqttLib.Core.Messages
             set { isDuplicate = value; }
         }
 
-        public ushort MessageID
+        public ulong MessageID
         {
             get
             {
@@ -206,6 +207,14 @@ namespace MqttLib.Core.Messages
             str.WriteByte((byte)(val & 0xFF));
         }
 
+        protected static void WriteToStream(Stream str, ulong val)
+        {
+            WriteToStream(str, (ushort)((val >> 48) & 0xFFFF));
+            WriteToStream(str, (ushort)((val >> 32) & 0xFFFF));
+            WriteToStream(str, (ushort)((val >> 16) & 0xFFFF));
+            WriteToStream(str, (ushort)(val & 0xFFFF));
+        }
+
         protected static void WriteToStream(Stream str, string val)
         {
             UTF8Encoding enc = new UTF8Encoding();
@@ -220,6 +229,15 @@ namespace MqttLib.Core.Messages
           byte[] data = new byte[2];
           ReadCompleteBuffer( str, data );
           return (ushort)((data[0] << 8) + data[1]);
+        }
+
+        protected static ulong ReadUlongFromStream(Stream str)
+        {
+            // Read two bytes and interpret as ushort in Network Order
+            byte[] data = new byte[8];
+            ReadCompleteBuffer(str, data);
+            return ((ulong)data[0] << 0x38) | ((ulong)data[1] << 0x30) | ((ulong)data[2] << 0x28) | ((ulong)data[3] << 0x20) |
+                           ((ulong)data[4] << 0x18) | ((ulong)data[5] << 0x10) | ((ulong)data[6] << 0x8) | (ulong)data[7];
         }
 
         protected static string ReadStringFromStream(Stream str)

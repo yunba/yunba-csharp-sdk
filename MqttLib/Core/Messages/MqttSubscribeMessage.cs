@@ -12,7 +12,7 @@ namespace MqttLib.Core.Messages
         /// Subscribe to multiple topics
         /// </summary>
         /// <param name="subscriptions">Array of Subscription objects</param>
-        public MqttSubscribeMessage(ushort messageID, Subscription[] subscriptions) : base(MessageType.SUBSCRIBE)
+        public MqttSubscribeMessage(ulong messageID, Subscription[] subscriptions) : base(MessageType.SUBSCRIBE)
         {
             _messageID = messageID;
             _subscriptions = subscriptions;
@@ -25,7 +25,7 @@ namespace MqttLib.Core.Messages
             }
 
             this.variableHeaderLength = (
-                                            2 + // Length of message ID
+                                            8 + // Length of message ID
                                             payloadLength // Length of the payload
                                         );
         }

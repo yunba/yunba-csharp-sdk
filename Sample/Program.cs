@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 using MqttLib;
 
@@ -8,31 +9,49 @@ namespace Sample
 {
 	class Program
 	{
+        // static int count = 0;
+
 		static void Main(string[] args)
 		{
-			if (args.Length != 2)
+			if (args.Length != 1)
 			{
-
-				Console.WriteLine("Usage: " + Environment.GetCommandLineArgs()[0] + " ConnectionString ClientId");
+                Console.WriteLine("Usage: " + Environment.GetCommandLineArgs()[0] + " Appkey");
 				return;
 			}
 
 			Console.WriteLine("Starting MqttDotNet sample program.");
 			Console.WriteLine("Press any key to stop\n");
 			
-			Program prog = new Program(args[0], args[1]);
+			Program prog = new Program(args[0]);
 			prog.Start();
+
+            /*
+            while(true)
+            {
+                Thread.Sleep(2000);
+
+                if (_client.IsConnected)
+                {
+                    PublishSomething("pubtest2", "message " + (++count));
+                }
+            }
+            */
 
 			Console.ReadKey();
 			prog.Stop();
 		}
 
-		IMqtt _client;
+		static IMqtt _client;
 
-		Program(string connectionString, string clientId)
+        Program(string appkey)
 		{
-			// Instantiate client using MqttClientFactory
-			_client = MqttClientFactory.CreateClient(connectionString, clientId);
+            Console.WriteLine("Initialize the client with the appkey: " + appkey + "\n");
+
+			// Instantiate client using MqttClientFactory with appkey
+            _client = MqttClientFactory.CreateClientWithAppkey(appkey);
+
+            // Enable auto reconnect
+            _client.AutoReconnect = true;
 
 			// Setup some useful client delegate callbacks
 			_client.Connected += new ConnectionDelegate(client_Connected);
@@ -42,7 +61,6 @@ namespace Sample
 
 		void Start()
 		{
-			// Connect to broker in 'CleanStart' mode
 			Console.WriteLine("Client connecting\n");
 			_client.Connect(true);
 		}
@@ -61,7 +79,7 @@ namespace Sample
 		{
 			Console.WriteLine("Client connected\n");
 			RegisterOurSubscriptions();
-			PublishSomething();
+            PublishSomething("pubtest2", "connection is ok.");
 		}
 
 		void _client_ConnectionLost(object sender, EventArgs e)
@@ -71,14 +89,14 @@ namespace Sample
 
 		void RegisterOurSubscriptions()
 		{
-			Console.WriteLine("Subscribing to mqttdotnet/subtest/#\n");
-			_client.Subscribe("mqttdotnet/subtest/#", QoS.BestEfforts);
+            Console.WriteLine("Subscribing to pubtest\n");
+            _client.Subscribe("pubtest2", QoS.AtLeastOnce);
 		}
 
-		void PublishSomething()
+        static void PublishSomething(string topic, string msg)
 		{
-			Console.WriteLine("Publishing on mqttdotnet/pubtest\n");
-			_client.Publish("mqttdotnet/pubtest", "Hello MQTT World", QoS.BestEfforts, false);
+			Console.WriteLine("Publishing on " + topic + ": " + msg + "\n");
+            _client.Publish(topic, msg, QoS.AtLeastOnce, false);
 		}
 
 		bool client_PublishArrived(object sender, PublishArrivedArgs e)

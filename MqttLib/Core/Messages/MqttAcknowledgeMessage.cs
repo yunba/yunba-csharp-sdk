@@ -9,14 +9,14 @@ namespace MqttLib.Core.Messages
     /// </summary>
     internal abstract class MqttAcknowledgeMessage : MqttMessage
     {
-        protected ushort _ackID;
+        protected ulong _ackID;
 
-        public ushort AckID
+        public ulong AckID
         {
             get { return _ackID; }
         }
 
-        public MqttAcknowledgeMessage(MessageType msgType, int varLength, ushort ackID)
+        public MqttAcknowledgeMessage(MessageType msgType, int varLength, ulong ackID)
             : base(msgType, varLength)
         {
             _ackID = ackID;

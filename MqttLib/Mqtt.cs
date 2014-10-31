@@ -27,8 +27,11 @@ namespace MqttLib
         private string _username;
         private string _password;
         private ushort _keepAlive = 30;
-        private ushort messageID = 1;
         private Timer keepAliveTimer = null;
+        private DateTime EPOCH = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+        private bool autoReconnect = false;
+        private int autoReconnectTimeout = 500;        // ms
+        private MqttConnectMessage connectMsg;
 
         #endregion
 
@@ -46,6 +49,18 @@ namespace MqttLib
             set { qosManager.ResendInterval = value; }
         }
 
+        public bool AutoReconnect
+        {
+            get { return autoReconnect; }
+            set { autoReconnect = value; }
+        }
+
+        public int AutoReconnectTimeout
+        {
+            get { return autoReconnectTimeout; }
+            set { autoReconnectTimeout = value; }
+        }
+
         public Mqtt(string connString, string clientID, string username, string password, IPersistence store)
         {
             _store = store;
@@ -55,6 +70,13 @@ namespace MqttLib
             _clientID = clientID;
             _username = username;
             _password = password;
+
+            this.ConnectionLost += Mqtt_ConnectionLost;
+        }
+
+        void Mqtt_ConnectionLost(object sender, EventArgs e)
+        {
+            DoReconnect();
         }
 
         void tmrCallback(object args)
@@ -119,6 +141,7 @@ namespace MqttLib
                     OnUnsubscribed(new CompleteArgs(m2.AckID));
                     break;
                 case MessageType.PINGRESP:
+                case MessageType.EXTENDEDACK:
                     break;
                 case MessageType.UNSUBSCRIBE:
                 case MessageType.CONNECT:
@@ -159,6 +182,8 @@ namespace MqttLib
 
         private void DoConnect(MqttConnectMessage conmsg)
         {
+            connectMsg = conmsg;
+
             try
             {
                 manager.Connect();
@@ -187,7 +212,7 @@ namespace MqttLib
 
         }
 
-        public int Publish(string topic, MqttPayload payload, QoS qos, bool retained)
+        public ulong Publish(string topic, MqttPayload payload, QoS qos, bool retained)
         {
             if (manager.IsConnected)
             {
@@ -197,7 +222,7 @@ namespace MqttLib
                     int kmillis = 1000 * _keepAlive;
                     keepAliveTimer.Change(kmillis, kmillis);
                 }
-                ushort messID = MessageID;
+                ulong messID = MessageID;
                 manager.SendMessage(new MqttPublishMessage(messID, topic, payload.TrimmedBuffer, qos, retained));
                 return messID;
             }
@@ -207,16 +232,16 @@ namespace MqttLib
             }
         }
 
-        public int Publish(MqttParcel parcel)
+        public ulong Publish(MqttParcel parcel)
         {
             return Publish(parcel.Topic, parcel.Payload, parcel.Qos, parcel.Retained);
         }
 
-        public int Subscribe(Subscription[] subscriptions)
+        public ulong Subscribe(Subscription[] subscriptions)
         {
             if (manager.IsConnected)
             {
-                ushort messID = MessageID;
+                ulong messID = MessageID;
                 manager.SendMessage(new MqttSubscribeMessage(messID, subscriptions));
                 return messID;
             }
@@ -226,21 +251,21 @@ namespace MqttLib
             }
         }
 
-        public int Subscribe(Subscription subscription)
+        public ulong Subscribe(Subscription subscription)
         {
             return Subscribe(new Subscription[] { subscription });
         }
 
-        public int Subscribe(string topic, QoS qos)
+        public ulong Subscribe(string topic, QoS qos)
         {
             return Subscribe(new Subscription(topic, qos));
         }
 
-        public int Unsubscribe(string[] topics)
+        public ulong Unsubscribe(string[] topics)
         {
             if (manager.IsConnected)
             {
-                ushort messID = MessageID;
+                ulong messID = MessageID;
                 manager.SendMessage(new MqttUnsubscribeMessage(messID, topics));
                 return messID;
             }
@@ -425,11 +450,34 @@ namespace MqttLib
 
         #endregion
 
-        private ushort MessageID
+        private ulong MessageID
         {
             get
             {
-                return messageID++;
+                ulong ms = (ulong)Math.Round((DateTime.Now - EPOCH).TotalMilliseconds);
+                ms = ms << 23;
+
+                Random rnd = new Random();
+                ulong id = ms | (uint)(rnd.Next() & 0x7FFFFF);
+                return id;
+            }
+        }
+
+        private void DoReconnect()
+        {
+            while (autoReconnect)
+            {
+                // Log.Write(LogLevel.INFO, "Client reconnect.");
+
+                try
+                {
+                    DoConnect(connectMsg);
+                    break;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(autoReconnectTimeout);
+                }
             }
         }
 

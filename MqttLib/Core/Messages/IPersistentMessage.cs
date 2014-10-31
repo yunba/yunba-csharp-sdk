@@ -3,7 +3,7 @@ namespace MqttLib.Core.Messages
 {
     public interface IPersitentMessage
     {
-        ushort MessageID { get; }
+        ulong MessageID { get; }
         MessageType MsgType { get; }
         QoS QualityOfService { get; }
         bool Retained { get; }

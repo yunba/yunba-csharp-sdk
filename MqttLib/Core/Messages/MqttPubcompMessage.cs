@@ -6,9 +6,9 @@ namespace MqttLib.Core.Messages
 {
     internal class MqttPubcompMessage : MqttMessage
     {
-        private ushort _ackID;
+        private ulong _ackID;
 
-        public ushort AckID
+        public ulong AckID
         {
             get
             {
@@ -16,7 +16,8 @@ namespace MqttLib.Core.Messages
             }
         }
 
-        public MqttPubcompMessage(ushort ackID) : base(MessageType.PUBCOMP, 2)
+        public MqttPubcompMessage(ulong ackID)
+            : base(MessageType.PUBCOMP, 8)
         {
             _ackID = ackID;
         }
@@ -28,7 +29,7 @@ namespace MqttLib.Core.Messages
 
         protected override void ConstructFromStream(Stream str)
         {
-            _ackID = ReadUshortFromStream(str);
+            _ackID = ReadUlongFromStream(str);
         }
 
         protected override void SendPayload(Stream str)

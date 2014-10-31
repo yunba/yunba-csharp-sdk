@@ -11,7 +11,7 @@
     <RootNamespace>Sample</RootNamespace>
     <AssemblyName>Sample</AssemblyName>
     <StartupObject>Sample.Program</StartupObject>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -63,12 +63,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MqttLib\MqttLib.csproj">
-      <Project>{8714BC76-4234-4406-AECF-4D28DFF98A1F}</Project>
-      <Name>MqttLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +76,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MqttLib\MqttLib.csproj">
+      <Project>{8714bc76-4234-4406-aecf-4d28dff98a1f}</Project>
+      <Name>MqttLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

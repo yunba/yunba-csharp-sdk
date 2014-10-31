@@ -62,5 +62,7 @@ namespace MqttLib
     /// is disconnected, close the channel, and broker any last will and testament contract.
     /// </summary>
     ushort KeepAliveInterval { get; set;}
+
+    bool AutoReconnect { get; set; }
   }
 }

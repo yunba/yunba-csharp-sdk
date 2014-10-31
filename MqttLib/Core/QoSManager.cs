@@ -88,7 +88,7 @@ namespace MqttLib.Core
               }
               else if (mess.QualityOfService == QoS.OnceAndOnceOnly)
               {
-                _responses.Add(mess.MessageID, new MqttPubrelMessage(mess.MessageID));
+                _responses.Add(mess.MessageID, new MqttPubrecMessage(mess.MessageID));
               }
             }
 
@@ -111,13 +111,37 @@ namespace MqttLib.Core
             {
                 lock (_messages)
                 {
-                    _messages.Add(mess.MessageID, mess);
+                    if (mess is MqttLib.Core.Messages.MqttAcknowledgeMessage)
+                    {
+                        MqttAcknowledgeMessage ackMess = (MqttAcknowledgeMessage)mess;
+                        _messages.Add(ackMess.AckID, mess);
+                    }
+                    else if (mess is MqttLib.Core.Messages.MqttPubrecMessage)
+                    {
+                        MqttPubrecMessage pubrec = (MqttPubrecMessage)mess;
+                        _messages.Add(pubrec.AckID, mess);
+                    }
+                    // Check if the message is a PUBCOMP
+                    else if (mess is MqttLib.Core.Messages.MqttPubcompMessage)
+                    {
+                        MqttPubcompMessage pubcomp = (MqttPubcompMessage)mess;
+                        _messages.Add(pubcomp.AckID, mess);
+                    }
+                    else if (mess is MqttLib.Core.Messages.MqttPubrelMessage)
+                    {
+                        MqttPubrelMessage pubrel = (MqttPubrelMessage)mess;
+                        _messages.Add(pubrel.AckID, mess);
+                    }
+                    else
+                    {
+                        _messages.Add(mess.MessageID, mess);
+                    }
                 }
             }
 
         }
 
-        private void removeMessage(ushort messageID)
+        private void removeMessage(ulong messageID)
         {
             lock (_messages) 
             {
@@ -145,7 +169,7 @@ namespace MqttLib.Core
             }
         }
 
-        public void PublishAccepted(ushort messageID, bool accepted)
+        public void PublishAccepted(ulong messageID, bool accepted)
         {
             // Called if the user accepts a publish
             if (accepted)
