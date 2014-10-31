@@ -2,12 +2,16 @@ yunba-csharp-sdk
 ================
 
 This repository is based on MqttDotNet. Please visit:
+
 http://github.com/stevenlovegrove/MqttDotNet
+
 http://www.doc.ic.ac.uk/~sl203/
+
 for information about MqttDotNet
 
 ## Dependency
 .NET Framework 4.5
+
 [Newtonsoft.Json][1]
 
 ## How to build
