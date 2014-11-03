@@ -9,13 +9,13 @@ namespace MqttLib
     /// <summary>
     /// Connect to the MQTT message broker
     /// </summary>
-    void Connect();
+    void Start();
 
     /// <summary>
     /// Connect to the MQTT message broker
     /// </summary>
     /// <param name="cleanStart">If true, all previous subscriptions and pending messages for client are lost</param>
-    void Connect(bool cleanStart);
+    void Start(bool cleanStart);
 
     /// <summary>
     /// Connect to the MQTT message broker specifying last will & testament (LWT)
@@ -24,7 +24,7 @@ namespace MqttLib
     /// <param name="willQoS">QoS of LWT</param>
     /// <param name="willMsg">Message body of LWT</param>
     /// <param name="willRetain">Whether LWT is retained</param>
-    void Connect(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain);
+    void Start(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain);
 
     /// <summary>
     /// Connect to the MQTT message broker specifying last will & testament (LWT)
@@ -34,12 +34,12 @@ namespace MqttLib
     /// <param name="willMsg">Message body of LWT</param>
     /// <param name="willRetain">Whether LWT is retained</param>
     /// <param name="cleanStart">If true, all previous subscriptions and pending messages for client are lost</param>
-    void Connect(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain, bool cleanStart);
+    void Start(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain, bool cleanStart);
 
     /// <summary>
     /// Disconnect from the MQTT message broker
     /// </summary>
-    void Disconnect();
+    void Stop();
 
     /// <summary>
     /// Fired when the connection to the broker is lost
@@ -54,7 +54,7 @@ namespace MqttLib
     /// <summary>
     /// Returns true if the client is connected to a broker, false otherwise
     /// </summary>
-    bool IsConnected { get;}
+    bool IsStopped { get; }
 
     /// <summary>
     /// Interval (in seconds) in which Client is expected to Ping Broker to keep session alive.

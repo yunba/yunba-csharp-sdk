@@ -152,28 +152,28 @@ namespace MqttLib
             }
         }
 
-        public void Connect()
+        public void Start()
         {
             DoConnect(new MqttConnectMessage(
               _clientID, _username, _password, _keepAlive, false
             ));
         }
 
-        public void Connect(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain)
+        public void Start(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain)
         {
             DoConnect(new MqttConnectMessage(
               _clientID, _username, _password, _keepAlive, willTopic, willMsg.TrimmedBuffer, willQoS, willRetain, false
             ));
         }
 
-        public void Connect(bool cleanStart)
+        public void Start(bool cleanStart)
         {
             DoConnect(new MqttConnectMessage(
               _clientID, _username, _password, _keepAlive, cleanStart
             ));
         }
 
-        public void Connect(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain, bool cleanStart)
+        public void Start(string willTopic, QoS willQoS, MqttPayload willMsg, bool willRetain, bool cleanStart)
         {
             DoConnect(new MqttConnectMessage(
               _clientID, _username, _password, _keepAlive, willTopic, willMsg.TrimmedBuffer, willQoS, willRetain, cleanStart
@@ -200,7 +200,7 @@ namespace MqttLib
             }
         }
 
-        public void Disconnect()
+        public void Stop()
         {
             manager.SendMessage(new MqttDisconnectMessage());
             if (keepAliveTimer != null)
@@ -275,7 +275,7 @@ namespace MqttLib
             }
         }
 
-        public bool IsConnected
+        public bool IsStopped
         {
             get
             {

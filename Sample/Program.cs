@@ -9,7 +9,7 @@ namespace Sample
 {
 	class Program
 	{
-        // static int count = 0;
+        static int count = 0;
 
 		static void Main(string[] args)
 		{
@@ -25,17 +25,15 @@ namespace Sample
 			Program prog = new Program(args[0]);
 			prog.Start();
 
-            /*
             while(true)
             {
                 Thread.Sleep(2000);
 
-                if (_client.IsConnected)
+                if (_client.IsStopped)
                 {
-                    PublishSomething("pubtest2", "message " + (++count));
+                    PublishSomething("pubtest", "message " + (++count));
                 }
             }
-            */
 
 			Console.ReadKey();
 			prog.Stop();
@@ -62,15 +60,15 @@ namespace Sample
 		void Start()
 		{
 			Console.WriteLine("Client connecting\n");
-			_client.Connect(true);
+			_client.Start(true);
 		}
 
 		void Stop()
 		{
-			if (_client.IsConnected)
+			if (_client.IsStopped)
 			{
 				Console.WriteLine("Client disconnecting\n");
-				_client.Disconnect();
+				_client.Stop();
 				Console.WriteLine("Client disconnected\n");
 			}
 		}
@@ -79,7 +77,7 @@ namespace Sample
 		{
 			Console.WriteLine("Client connected\n");
 			RegisterOurSubscriptions();
-            PublishSomething("pubtest2", "connection is ok.");
+            PublishSomething("pubtest", "connection is ok.");
 		}
 
 		void _client_ConnectionLost(object sender, EventArgs e)
@@ -90,7 +88,7 @@ namespace Sample
 		void RegisterOurSubscriptions()
 		{
             Console.WriteLine("Subscribing to pubtest\n");
-            _client.Subscribe("pubtest2", QoS.AtLeastOnce);
+            _client.Subscribe("pubtest", QoS.AtLeastOnce);
 		}
 
         static void PublishSomething(string topic, string msg)
