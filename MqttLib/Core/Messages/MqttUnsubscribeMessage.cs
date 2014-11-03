@@ -13,6 +13,7 @@ namespace MqttLib.Core.Messages
         {
             _messageID = messageID;
             _topics = topics;
+            base.msgQos = QoS.AtLeastOnce;
             int payloadLength = 0;
 
             // Work out the length of the payload
