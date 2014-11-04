@@ -25,26 +25,41 @@ Sample.exe YourYunbaAppkey
 ```
 
 ## The basic APIs
-### CreateClientWithAppkey
+### CreateClientWithAppkey(string yunbaAppkey)
 Create a client instance using your yunba appkey.
+* yunbaAppkey is a string associated with [YunBa account][2].
 ```C#
 IMqtt client = MqttClientFactory.CreateClientWithAppkey("YourYunbaAppkey");
 ```
 
-### Start
+### Start()
 Start up the client.
 ```C#
 client.Start();
 ```
 
-### Subscribe
+### Subscribe(string topic, QoS qos)
 Subscribe a topic with a specific Qos level.
+* topic is a string topic to subscribe to.
+* qos is the granted qos level on it.
 ```C#
 client.Subscribe("topic_name", QoS.AtLeastOnce);
 ```
 
-### Publish
+### Unsubscribe(string[] topics)
+Unsubscribe from topics.
+* topics is an array of topics to unsubscribe from.
+```C#
+string[] topics = {"topic_name"};
+client.Unsubscribe(topics);
+```
+
+### Publish(string topic, MqttPayload payload, QoS qos, bool retained)
 Publish a message to a topic with a specific Qos level.
+* topic is the topic to publish to.
+* payload is the message to publish.
+* qos is the qos level.
+* retained is the retain flag.
 ```C#
 client.Publish("topic_name", "message_content", QoS.AtLeastOnce, false);
 ```
@@ -87,3 +102,4 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 ```
 
 [1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net45
+[2]: http://yunba.io/account/
