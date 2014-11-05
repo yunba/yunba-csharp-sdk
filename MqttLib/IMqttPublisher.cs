@@ -11,7 +11,7 @@ namespace MqttLib
     /// </summary>
     /// <param name="topic">Destination of message</param>
     /// <param name="payload">Message body</param>
-    /// <param name="qos">QoS</param>
+    /// <param name="qos">QoS level</param>
     /// <param name="retained">Whether the message is retained by the broker</param>
     /// <returns>Message ID</returns>
     ulong Publish(string topic, MqttPayload payload, QoS qos, bool retained);
@@ -22,6 +22,27 @@ namespace MqttLib
     /// <param name="parcel">Parcel containing destination topic, message body, QoS and if the message should be retained</param>
     /// <returns>Message ID</returns>
     ulong Publish(MqttParcel parcel);
+
+    /// <summary>
+    /// Set an alias for the client
+    /// </summary>
+    /// <param name="alias">alias name</param>
+    void SetAlias(string alias);
+
+    /// <summary>
+    /// Request the alias, please setup AliasGeted delegate callback to get the alias name
+    /// </summary>
+    void GetAlias();
+
+    /// <summary>
+    /// Publish a message to a specific client with alias
+    /// </summary>
+    /// <param name="alias">alias name</param>
+    /// <param name="payload">Message body</param>
+    /// <param name="qos">QoS level</param>
+    /// <param name="retained">Whether the message is retained by the broker</param>
+    /// <returns>Message ID</returns>
+    ulong PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained);
 
     /// <summary>
     /// Fired when receipt of publication is confirmed

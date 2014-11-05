@@ -25,6 +25,7 @@ namespace Sample
 			Program prog = new Program(args[0]);
 			prog.Start();
 
+            /*
             while(true)
             {
                 Thread.Sleep(2000);
@@ -34,8 +35,14 @@ namespace Sample
                     PublishSomething("pubtest", "message " + (++count));
                 }
             }
+            */
 
-			Console.ReadKey();
+            Console.ReadKey();
+
+            Console.WriteLine("Getting Alias...");
+            _client.GetAlias();
+
+            Console.ReadKey();
 			prog.Stop();
 		}
 
@@ -55,6 +62,7 @@ namespace Sample
 			_client.Connected += new ConnectionDelegate(client_Connected);
 			_client.ConnectionLost += new ConnectionDelegate(_client_ConnectionLost);
 			_client.PublishArrived += new PublishArrivedDelegate(client_PublishArrived);
+            _client.AliasGeted += new PublishArrivedDelegate(client_AliasGeted);
 		}
 
 		void Start()
@@ -76,6 +84,8 @@ namespace Sample
 		void client_Connected(object sender, EventArgs e)
 		{
 			Console.WriteLine("Client connected\n");
+
+            _client.SetAlias("test");
 			RegisterOurSubscriptions();
             PublishSomething("pubtest", "connection is ok.");
 		}
@@ -95,6 +105,9 @@ namespace Sample
 		{
 			Console.WriteLine("Publishing on " + topic + ": " + msg + "\n");
             _client.Publish(topic, msg, QoS.AtLeastOnce, false);
+
+            Console.WriteLine("Publishing to alias test2: " + msg + "\n");
+            _client.PublishToAlias("test2", msg, QoS.AtLeastOnce, false);
 		}
 
 		bool client_PublishArrived(object sender, PublishArrivedArgs e)
@@ -105,6 +118,15 @@ namespace Sample
 			Console.WriteLine();
 			return true;
 		}
+
+        bool client_AliasGeted(object sender, PublishArrivedArgs e)
+        {
+            Console.WriteLine("Received get alias operation ack");
+            Console.WriteLine("alias name: " + e.Payload);
+            Console.WriteLine();
+
+            return true;
+        }
 
 	}
 

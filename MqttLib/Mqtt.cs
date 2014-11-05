@@ -237,6 +237,21 @@ namespace MqttLib
             return Publish(parcel.Topic, parcel.Payload, parcel.Qos, parcel.Retained);
         }
 
+        public void SetAlias(string alias)
+        {
+            Publish(",yali", alias, QoS.AtLeastOnce, false);
+        }
+
+        public void GetAlias()
+        {
+            Publish(",yaliget", "", QoS.AtLeastOnce, false);
+        }
+
+        public ulong PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained)
+        {
+            return Publish(",yta/" + alias, payload, qos, retained);
+        }
+
         public ulong Subscribe(Subscription[] subscriptions)
         {
             if (manager.IsConnected)
@@ -287,6 +302,8 @@ namespace MqttLib
 
         public event CompleteDelegate Published;
 
+        public event PublishArrivedDelegate AliasGeted;
+
         public event CompleteDelegate Subscribed;
 
         public event CompleteDelegate Unsubscribed;
@@ -328,7 +345,22 @@ namespace MqttLib
         {
             bool accepted = false;
 
-            if (PublishArrived != null)
+            if (m.Topic == ",yaliget")
+            {
+                if (AliasGeted != null)
+                {
+                    PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
+                    try
+                    {
+                        accepted |= AliasGeted(this, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        MqttLib.Logger.Log.Write(LogLevel.ERROR, "MqttLib: Uncaught exception from user delegate: " + ex.ToString());
+                    }
+                }
+            }
+            else if (PublishArrived != null)
             {
                 PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
                 try
