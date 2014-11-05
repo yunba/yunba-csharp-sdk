@@ -64,6 +64,29 @@ Publish a message to a topic with a specific Qos level.
 client.Publish("topic_name", "message_content", QoS.AtLeastOnce, false);
 ```
 
+### SetAlias(string alias)
+Set an alias for the client.
+* alias is a string.
+```C#
+client.SetAlias("myname");
+```
+
+### GetAlias()
+Request the client's alias, please setup AliasGeted delegate callback to get the alias name.
+```C#
+client.GetAlias();
+```
+
+### PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained)
+Publish a message to a specific client with alias.
+* alias is a string.
+* payload is the message to publish.
+* qos is the qos level.
+* retained is the retain flag.
+```C#
+client.PublishToAlias("myname", "message_content", QoS.AtLeastOnce, false);
+```
+
 ## The basic events
 ### Connected
 Fired when a connection is made.
@@ -98,6 +121,20 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 	Console.WriteLine("Topic: " + e.Topic);
 	Console.WriteLine("Payload: " + e.Payload);
 	return true;
+}
+```
+
+### AliasGeted
+Fired when the get alias operation returned
+```C#
+client.AliasGeted += new PublishArrivedDelegate(client_AliasGeted);
+
+bool client_AliasGeted(object sender, PublishArrivedArgs e)
+{
+        Console.WriteLine("Received get alias operation ack");
+        Console.WriteLine("alias name: " + e.Payload);
+        Console.WriteLine();
+        return true;
 }
 ```
 
