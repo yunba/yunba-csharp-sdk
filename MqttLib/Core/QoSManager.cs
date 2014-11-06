@@ -83,12 +83,18 @@ namespace MqttLib.Core
             {
               if (mess.QualityOfService == QoS.AtLeastOnce)
               {
-                // Queue an acknowlegement
-                _responses.Add(mess.MessageID, new MqttPubackMessage(mess.MessageID));
+                  if (!_responses.Contains(mess.MessageID))
+                  {
+                      // Queue an acknowlegement
+                      _responses.Add(mess.MessageID, new MqttPubackMessage(mess.MessageID));
+                  }
               }
               else if (mess.QualityOfService == QoS.OnceAndOnceOnly)
               {
-                _responses.Add(mess.MessageID, new MqttPubrecMessage(mess.MessageID));
+                  if (!_responses.Contains(mess.MessageID))
+                  {
+                      _responses.Add(mess.MessageID, new MqttPubrecMessage(mess.MessageID));
+                  }
               }
             }
 
@@ -134,7 +140,10 @@ namespace MqttLib.Core
                     }
                     else
                     {
-                        _messages.Add(mess.MessageID, mess);
+                        if (!_messages.Contains(mess.MessageID))
+                        {
+                            _messages.Add(mess.MessageID, mess);
+                        }
                     }
                 }
             }
