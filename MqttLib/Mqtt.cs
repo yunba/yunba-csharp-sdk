@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using MqttLib.Core.Messages;
 using MqttLib.Core;
 using MqttLib;
@@ -9,6 +11,8 @@ using System.Threading;
 using System.Diagnostics;
 using MqttLib.Logger;
 using MqttLib.MatchTree;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MqttLib
 {
@@ -29,9 +33,11 @@ namespace MqttLib
         private ushort _keepAlive = 30;
         private Timer keepAliveTimer = null;
         private DateTime EPOCH = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+        private bool isActiveStop = true;
         private bool autoReconnect = false;
         private int autoReconnectTimeout = 500;        // ms
         private MqttConnectMessage connectMsg;
+        private Hashtable extendAckCallBacks = new Hashtable();
 
         #endregion
 
@@ -76,7 +82,10 @@ namespace MqttLib
 
         void Mqtt_ConnectionLost(object sender, EventArgs e)
         {
-            DoReconnect();
+            extendAckCallBacks.Clear();
+
+            if (!isActiveStop)
+                DoReconnect();
         }
 
         void tmrCallback(object args)
@@ -140,8 +149,14 @@ namespace MqttLib
                     MqttUnsubackMessage m2 = (MqttUnsubackMessage)e.Message;
                     OnUnsubscribed(new CompleteArgs(m2.AckID));
                     break;
-                case MessageType.PINGRESP:
                 case MessageType.EXTENDEDACK:
+                    MqttExtendedackMessage mm = (MqttExtendedackMessage)e.Message;
+                    if (mm.CommondId == 8)
+                        OnPublish2ed(mm);
+                    else
+                        OnExtendedAckArrived(new ExtendedAckArrivedArgs(mm.MessageID, mm.CommondId, mm.Status, mm.Payload));
+                    break;
+                case MessageType.PINGRESP:
                     break;
                 case MessageType.UNSUBSCRIBE:
                 case MessageType.CONNECT:
@@ -183,6 +198,7 @@ namespace MqttLib
         private void DoConnect(MqttConnectMessage conmsg)
         {
             connectMsg = conmsg;
+            isActiveStop = false;
 
             try
             {
@@ -202,6 +218,9 @@ namespace MqttLib
 
         public void Stop()
         {
+            isActiveStop = true;
+            extendAckCallBacks.Clear();
+
             manager.SendMessage(new MqttDisconnectMessage());
             if (keepAliveTimer != null)
             {
@@ -237,19 +256,29 @@ namespace MqttLib
             return Publish(parcel.Topic, parcel.Payload, parcel.Qos, parcel.Retained);
         }
 
-        public void SetAlias(string alias)
+        public ulong Publish2(string topic, MqttPayload payload, QoS qos, string apn_json)
         {
-            Publish(",yali", alias, QoS.AtLeastOnce, false);
-        }
+            if (manager.IsConnected)
+            {
+                ulong messID = MessageID;
 
-        public void GetAlias()
-        {
-            Publish(",yaliget", "", QoS.AtLeastOnce, false);
+                manager.SendMessage(new MqttExtendedackMessage(messID, topic, payload.TrimmedBuffer, qos, apn_json));
+                return messID;
+            }
+            else
+            {
+                throw new MqttNotConnectedException("You need to connect to a broker before trying to Publish");
+            }
         }
 
         public ulong PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained)
         {
             return Publish(",yta/" + alias, payload, qos, retained);
+        }
+
+        public ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, string apn_json)
+        {
+            return Publish2(",yta/" + alias, payload, qos, apn_json);
         }
 
         public ulong Subscribe(Subscription[] subscriptions)
@@ -290,6 +319,36 @@ namespace MqttLib
             }
         }
 
+        public void SetAlias(string alias)
+        {
+            Publish(",yali", alias, QoS.AtLeastOnce, false);
+        }
+
+        public void GetAlias(ExtendedAckArrivedDelegate cb)
+        {
+            SendExtendMessage(1, "", cb);
+        }
+
+        public void GetTopicList(ExtendedAckArrivedDelegate cb)
+        {
+            SendExtendMessage(3, "", cb);
+        }
+
+        public void GetTopicList(string alias, ExtendedAckArrivedDelegate cb)
+        {
+            SendExtendMessage(3, alias, cb);
+        }
+
+        public void GetAliasList(string topic, ExtendedAckArrivedDelegate cb)
+        {
+            SendExtendMessage(5, topic, cb);
+        }
+
+        public void GetState(string alias, ExtendedAckArrivedDelegate cb)
+        {
+            SendExtendMessage(9, alias, cb);
+        }
+
         public bool IsStopped
         {
             get
@@ -301,8 +360,6 @@ namespace MqttLib
         public event PublishArrivedDelegate PublishArrived;
 
         public event CompleteDelegate Published;
-
-        public event PublishArrivedDelegate AliasGeted;
 
         public event CompleteDelegate Subscribed;
 
@@ -344,25 +401,10 @@ namespace MqttLib
         protected void OnPublishArrived(MqttPublishMessage m)
         {
             bool accepted = false;
+            PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
 
-            if (m.Topic == ",yaliget")
+            if (PublishArrived != null)
             {
-                if (AliasGeted != null)
-                {
-                    PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
-                    try
-                    {
-                        accepted |= AliasGeted(this, e);
-                    }
-                    catch (Exception ex)
-                    {
-                        MqttLib.Logger.Log.Write(LogLevel.ERROR, "MqttLib: Uncaught exception from user delegate: " + ex.ToString());
-                    }
-                }
-            }
-            else if (PublishArrived != null)
-            {
-                PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
                 try
                 {
                     accepted |= PublishArrived(this, e);
@@ -375,7 +417,6 @@ namespace MqttLib
 
             if (topicTree != null)
             {
-                PublishArrivedArgs e = new PublishArrivedArgs(m.Topic, m.Payload, m.Retained, m.QualityOfService);
                 List<PublishArrivedDelegate> subscribers = topicTree.CollectMatches(new Topic(m.Topic));
                 foreach (PublishArrivedDelegate pad in subscribers)
                 {
@@ -409,6 +450,27 @@ namespace MqttLib
                 {
                     MqttLib.Logger.Log.Write(LogLevel.ERROR, "MqttLib: Uncaught exception from user delegate: " + ex.ToString());
                 }
+            }
+        }
+
+        protected void OnPublish2ed(MqttExtendedackMessage m)
+        {
+            OnPublished(new CompleteArgs(m.MessageID));
+        }
+
+        protected void OnExtendedAckArrived(ExtendedAckArrivedArgs e)
+        {
+            /*
+            Console.WriteLine("Extended ack arrived");
+            Console.WriteLine("Commond id: " + e.CommondID);
+            Console.WriteLine("Commond status: " + e.Status);
+            Console.WriteLine("Payload: " + e.Payload);
+            Console.WriteLine();
+            */
+
+            if(extendAckCallBacks.Contains(e.MessageID))
+            {
+                ((ExtendedAckArrivedDelegate)extendAckCallBacks[e.MessageID])(this, e);
             }
         }
 
@@ -513,5 +575,20 @@ namespace MqttLib
             }
         }
 
+        private void SendExtendMessage(byte cmdID, string msg, ExtendedAckArrivedDelegate cb)
+        {
+            if (manager.IsConnected)
+            {
+                ulong messID = MessageID;
+
+                manager.SendMessage(new MqttExtendedackMessage(messID, cmdID, msg));
+
+                extendAckCallBacks.Add(messID, cb);
+            }
+            else
+            {
+                throw new MqttNotConnectedException("You need to connect to a broker before trying to Publish");
+            }
+        }
     }
 }

@@ -23,3 +23,10 @@ public delegate void CompleteDelegate(object sender, CompleteArgs e);
 /// <param name="sender">Object responsible for invoking the delegate</param>
 /// <param name="e"></param>
 public delegate void ConnectionDelegate(object sender, EventArgs e);
+
+/// <summary>
+/// Delegate represents an extend message ack arrived.
+/// </summary>
+/// <param name="sender">Object responsible for invoking the delegate</param>
+/// <param name="e">Arguments containing Message data and other details</param>
+public delegate void ExtendedAckArrivedDelegate(object sender, ExtendedAckArrivedArgs e);

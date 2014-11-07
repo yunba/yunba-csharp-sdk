@@ -86,7 +86,9 @@
   <ItemGroup>
     <Compile Include="CompleteArgs.cs" />
     <Compile Include="Core\Messages\MqttExtendedackMessage.cs" />
+    <Compile Include="ExtendedAckArrivedArgs.cs" />
     <Compile Include="IMqttConnectDisconnect.cs" />
+    <Compile Include="IMqttExtend.cs" />
     <Compile Include="IMqttPublisher.cs" />
     <Compile Include="IMqttShared.cs" />
     <Compile Include="IMqttSharedSubscriber.cs" />

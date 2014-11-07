@@ -10,7 +10,7 @@ namespace MqttLib
   /// Users of an IMqtt object must handle their own subscription processing and
   /// division.
   /// </summary>
-  public interface IMqtt : IMqttPublisher, IMqttSubscriber, IMqttConnectDisconnect
+    public interface IMqtt : IMqttPublisher, IMqttSubscriber, IMqttConnectDisconnect, IMqttExtend
   {
     /// <summary>
     /// Get and Set interval (in milliseconds) to wait before resending unacknowledged messages

@@ -42,11 +42,6 @@ namespace MqttLib
     event PublishArrivedDelegate PublishArrived;
 
     /// <summary>
-    /// Fired when the get alias operation returned
-    /// </summary>
-    event PublishArrivedDelegate AliasGeted;
-
-    /// <summary>
     /// Fired when receipt of subscription is confirmed
     /// </summary>
     event CompleteDelegate Subscribed;

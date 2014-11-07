@@ -80,10 +80,9 @@ namespace MqttLib
                 throw e;
             }
 
-            /*
             Log.Write(LogLevel.INFO, "host: " + host);
             Log.Write(LogLevel.INFO, "client id: " + regInfo.clientId);
-            */
+           
 
             return new Mqtt(host, regInfo.clientId, regInfo.username, regInfo.password, null);
         }

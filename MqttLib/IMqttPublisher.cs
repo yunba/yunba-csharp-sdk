@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace MqttLib
 {
@@ -22,17 +23,6 @@ namespace MqttLib
     /// <param name="parcel">Parcel containing destination topic, message body, QoS and if the message should be retained</param>
     /// <returns>Message ID</returns>
     ulong Publish(MqttParcel parcel);
-
-    /// <summary>
-    /// Set an alias for the client
-    /// </summary>
-    /// <param name="alias">alias name</param>
-    void SetAlias(string alias);
-
-    /// <summary>
-    /// Request the alias, please setup AliasGeted delegate callback to get the alias name
-    /// </summary>
-    void GetAlias();
 
     /// <summary>
     /// Publish a message to a specific client with alias

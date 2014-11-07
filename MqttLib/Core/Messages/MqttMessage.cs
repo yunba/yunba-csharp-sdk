@@ -223,6 +223,12 @@ namespace MqttLib.Core.Messages
             str.Write(bs, 0, bs.Length);
         }
 
+        protected static void WriteToStream(Stream str, byte[] val)
+        {
+            WriteToStream(str, (ushort)val.Length);
+            str.Write(val, 0, val.Length);
+        }
+
         protected static ushort ReadUshortFromStream(Stream str)
         {
           // Read two bytes and interpret as ushort in Network Order
