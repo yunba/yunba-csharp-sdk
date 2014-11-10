@@ -35,6 +35,13 @@ namespace MqttLib
     ulong PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained);
 
     /// <summary>
+    /// Set an alias for the client
+    /// </summary>
+    /// <param name="alias">alias name</param>
+    /// <returns>Message ID</returns>
+    ulong SetAlias(string alias);
+
+    /// <summary>
     /// Fired when receipt of publication is confirmed
     /// </summary>
     event CompleteDelegate Published;
