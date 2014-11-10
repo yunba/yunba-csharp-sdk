@@ -54,7 +54,7 @@ namespace MqttLib
     /// <summary>
     /// Returns true if the client is connected to a broker, false otherwise
     /// </summary>
-    bool IsStopped { get; }
+    bool IsConnected { get; }
 
     /// <summary>
     /// Interval (in seconds) in which Client is expected to Ping Broker to keep session alive.

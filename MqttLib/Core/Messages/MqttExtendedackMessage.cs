@@ -16,6 +16,8 @@ namespace MqttLib.Core.Messages
             : base(MessageType.EXTENDEDACK, 8, msgID)
       {
             _commondId = commondId;
+            base._messageID = msgID;
+            base.msgQos = QoS.AtLeastOnce;
 
             UTF8Encoding enc = new UTF8Encoding();
             byte[] payload = enc.GetBytes(payloadStr);
@@ -34,6 +36,8 @@ namespace MqttLib.Core.Messages
             : base(MessageType.EXTENDEDACK, 8, msgID)
         {
             _commondId = 7;
+            base._messageID = msgID;
+            base.msgQos = QoS.AtLeastOnce;
 
             MemoryStream pay = new MemoryStream();
 
@@ -83,7 +87,7 @@ namespace MqttLib.Core.Messages
         {
             int payloadLen = base.variableHeaderLength;
 
-            _messageID = ReadUlongFromStream(str);
+            _messageID = _ackID = ReadUlongFromStream(str);
             payloadLen -= 8;
 
             _commondId = (byte)str.ReadByte();

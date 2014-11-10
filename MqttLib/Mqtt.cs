@@ -151,10 +151,10 @@ namespace MqttLib
                     break;
                 case MessageType.EXTENDEDACK:
                     MqttExtendedackMessage mm = (MqttExtendedackMessage)e.Message;
-                    if (mm.CommondId == 8)
+                    if (mm.CommondId == 8)        // publish2 ack or publish2alias ack
                         OnPublish2ed(mm);
                     else
-                        OnExtendedAckArrived(new ExtendedAckArrivedArgs(mm.MessageID, mm.CommondId, mm.Status, mm.Payload));
+                        OnExtendedAckArrived(new ExtendedAckArrivedArgs(mm.AckID, mm.CommondId, mm.Status, mm.Payload));
                     break;
                 case MessageType.PINGRESP:
                     break;
@@ -349,7 +349,7 @@ namespace MqttLib
             SendExtendMessage(9, alias, cb);
         }
 
-        public bool IsStopped
+        public bool IsConnected
         {
             get
             {
@@ -471,6 +471,7 @@ namespace MqttLib
             if(extendAckCallBacks.Contains(e.MessageID))
             {
                 ((ExtendedAckArrivedDelegate)extendAckCallBacks[e.MessageID])(this, e);
+                extendAckCallBacks.Remove(e.MessageID);
             }
         }
 
