@@ -10,9 +10,8 @@ http://www.doc.ic.ac.uk/~sl203/
 for information about MqttDotNet
 
 ## Dependency
-.NET Framework 4.0
+.NET Framework 2.0
 
-[Microsoft.Net.Http][3]
 [Newtonsoft.Json][1]
 
 ## How to build
@@ -223,4 +222,3 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 
 [1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net40
 [2]: http://yunba.io/account/
-[3]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Microsoft.Net.Http.2.2.28/lib/net40

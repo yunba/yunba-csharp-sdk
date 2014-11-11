@@ -1,10 +1,9 @@
 using System;
 using System.Text;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
+using System.Net;
 using System.Configuration;
 using System.Reflection;
+using System.IO;
 using MqttLib.Core;
 using MqttLib;
 using MqttLib.Logger;
@@ -99,31 +98,38 @@ namespace MqttLib
 
         private static RegInfo GetRegInfoWithAppkey(string yunbaAppkey)
         {
-            HttpClient httpClient = new HttpClient();
+            HttpWebRequest httpRequest = WebRequest.Create("http://reg.yunba.io:8383/device/reg/") as HttpWebRequest;
 
-            // Limit the max buffer size for the response so we don't get overwhelmed
-            httpClient.MaxResponseContentBufferSize = 256000;
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpRequest.Method = "POST";
+            httpRequest.Timeout = 30000;
+            httpRequest.ContentType = "application/json";
 
             JObject req = new JObject();
             req["a"] = yunbaAppkey;
             req["p"] = 2;
             string strReq = JsonConvert.SerializeObject(req);
 
-            var resp = httpClient.PostAsync("http://reg.yunba.io:8383/device/reg/", new StringContent(strReq, Encoding.UTF8, "application/json"));
-            resp.Result.EnsureSuccessStatusCode();
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(strReq);
+            httpRequest.ContentLength = buffer.Length;
+            httpRequest.GetRequestStream().Write(buffer, 0, buffer.Length);
 
-            JObject regInfo = (JObject)JsonConvert.DeserializeObject(resp.Result.Content.ReadAsStringAsync().Result);
-            return new RegInfo { username = (string)regInfo["u"], password = (string)regInfo["p"], clientId = (string)regInfo["c"] };
+            using(HttpWebResponse resp = httpRequest.GetResponse() as HttpWebResponse)
+            {
+                using(StreamReader stream = new StreamReader(resp.GetResponseStream(), System.Text.Encoding.UTF8))
+                {
+                    JObject regInfo = (JObject)JsonConvert.DeserializeObject(stream.ReadToEnd());
+                    return new RegInfo { username = (string)regInfo["u"], password = (string)regInfo["p"], clientId = (string)regInfo["c"] };
+                }
+            }
         }
 
         private static string GetHostWithAppkey(string yunbaAppkey)
         {
-            HttpClient httpClient = new HttpClient();
+            HttpWebRequest httpRequest = WebRequest.Create("http://tick.yunba.io:9999/") as HttpWebRequest;
 
-            // Limit the max buffer size for the response so we don't get overwhelmed
-            httpClient.MaxResponseContentBufferSize = 256000;
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpRequest.Method = "POST";
+            httpRequest.Timeout = 30000;
+            httpRequest.ContentType = "application/json";
 
             JObject req = new JObject();
             req["a"] = yunbaAppkey;
@@ -132,11 +138,18 @@ namespace MqttLib
             req["o"] = "1";
             string strReq = JsonConvert.SerializeObject(req);
 
-            var resp = httpClient.PostAsync("http://tick.yunba.io:9999/", new StringContent(strReq, Encoding.UTF8, "application/json"));
-            resp.Result.EnsureSuccessStatusCode();
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(strReq);
+            httpRequest.ContentLength = buffer.Length;
+            httpRequest.GetRequestStream().Write(buffer, 0, buffer.Length);
 
-            JObject hostInfo = (JObject)JsonConvert.DeserializeObject(resp.Result.Content.ReadAsStringAsync().Result);
-            return (string)hostInfo["c"];
+            using (HttpWebResponse resp = httpRequest.GetResponse() as HttpWebResponse)
+            {
+                using (StreamReader stream = new StreamReader(resp.GetResponseStream(), System.Text.Encoding.UTF8))
+                {
+                    JObject hostInfo = (JObject)JsonConvert.DeserializeObject(stream.ReadToEnd());
+                    return (string)hostInfo["c"];
+                }
+            }
         }
 
         private class RegInfo
