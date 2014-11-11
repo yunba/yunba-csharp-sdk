@@ -10,7 +10,7 @@ http://www.doc.ic.ac.uk/~sl203/
 for information about MqttDotNet
 
 ## Dependency
-.NET Framework 4.5
+.NET Framework 4.0
 
 [Newtonsoft.Json][1]
 
@@ -220,5 +220,5 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 }
 ```
 
-[1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net45
+[1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net40
 [2]: http://yunba.io/account/
