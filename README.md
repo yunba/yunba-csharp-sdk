@@ -155,7 +155,6 @@ Publish a message to a topic with some options.
 * apn_json is the APN options.
 
 ```C#
-JObject opts = new JObject();
 JObject apn_json = new JObject();
 JObject aps = new JObject();
 
@@ -163,9 +162,8 @@ aps.Add("sound", "bingbong.aiff");
 aps.Add("badge", 9);
 aps.Add("alert", "msg from .net");
 apn_json.Add("aps", aps);
-opts.Add("apn_json", apn_json);
 
-client.Publish2("topic_name", "message_content", QoS.AtLeastOnce, 30, JsonConvert.SerializeObject(opts));
+client.Publish2("topic_name", "message_content", QoS.AtLeastOnce, 30, JsonConvert.SerializeObject(apn_json));
 ```
 
 ### Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json)
