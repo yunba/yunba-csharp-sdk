@@ -38,6 +38,7 @@ namespace MqttLib
         private int autoReconnectTimeout = 500;        // ms
         private MqttConnectMessage connectMsg;
         private Hashtable extendAckCallBacks = new Hashtable();
+        private Random messageidRandom = new Random();
 
         #endregion
 
@@ -552,8 +553,7 @@ namespace MqttLib
                 ulong ms = (ulong)Math.Round((DateTime.Now - EPOCH).TotalMilliseconds);
                 ms = ms << 23;
 
-                Random rnd = new Random();
-                ulong id = ms | (uint)(rnd.Next() & 0x7FFFFF);
+                ulong id = ms | (uint)(messageidRandom.Next() & 0x7FFFFF);
                 return id;
             }
         }
