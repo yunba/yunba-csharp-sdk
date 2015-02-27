@@ -227,7 +227,7 @@ namespace MqttLib.Core
 
                     foreach(ulong mid in removeMessageIds)
                     {
-                        removeMessage(mid);
+                        _messages.Remove(mid);
                     }
                 }
                 Thread.Sleep(2000);
