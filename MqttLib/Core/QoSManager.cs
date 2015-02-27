@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using MqttLib.Core.Messages;
@@ -201,6 +202,7 @@ namespace MqttLib.Core
                 lock (_messages)
                 {
                     DateTime now = DateTime.Now;
+                    List<ulong> removeMessageIds = new List<ulong>();
 
                     foreach (MqttMessage mess in _messages.Values)
                     {
@@ -209,6 +211,8 @@ namespace MqttLib.Core
                         {
                             mess.Timestamp = now.Ticks;
                             mess.Duplicate = true;
+                            removeMessageIds.Add(mess.MessageID);
+
                             try
                             {
                               Log.Write( LogLevel.DEBUG, "Re-Sending - " + mess.MessageID);
@@ -219,6 +223,11 @@ namespace MqttLib.Core
                               // If we fail for some reason, we will try again another time automatically
                             }
                         }
+                    }
+
+                    foreach(ulong mid in removeMessageIds)
+                    {
+                        removeMessage(mid);
                     }
                 }
                 Thread.Sleep(2000);
