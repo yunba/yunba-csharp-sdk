@@ -24,6 +24,9 @@ for information about MqttDotNet
 Sample.exe YourYunbaAppkey
 ```
 
+## Clear the uesr's register information
+Remove the *.config file in the executable path.
+
 ## The basic APIs
 ### CreateClientWithAppkey(string yunbaAppkey)
 Create a client instance using your yunba appkey.
