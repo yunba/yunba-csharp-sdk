@@ -19,6 +19,8 @@ for information about MqttDotNet
 2. Build the MqttLib project for your application
 3. Build the Sample project for test
 
+**Tips**: Before you deploy the application, remember that remove the *.config file in the executable path.
+
 ## Test
 ```
 Sample.exe YourYunbaAppkey
