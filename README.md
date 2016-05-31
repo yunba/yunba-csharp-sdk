@@ -1,62 +1,68 @@
 yunba-csharp-sdk
 ================
 
-This repository is based on MqttDotNet. Please visit:
+本仓库基于 MqttDotNet。更多相关信息，请参考：
 
 http://github.com/stevenlovegrove/MqttDotNet
 
 http://www.doc.ic.ac.uk/~sl203/
 
-for information about MqttDotNet
 
-## Dependency
+## 依赖
+
 .NET Framework 2.0
 
 [Newtonsoft.Json][1]
 
-## How to build
-1. Open the included solution file using Visual Studio 2013: MqttDotNet.sln
-2. Build the MqttLib project for your application
-3. Build the Sample project for test
 
-**Tips**: Before you deploy the application, remember that remove the *.config file in the executable path.
+## 如何编译
+1. 用 Visual Studio 2013 打开 MqttDotNet.sln 工程文件。
+2. 编译 MqttLib 库
+3. 编译 Sample 工程，进行测试
 
-## Test
+**提示** 在部署应用之前，请先移除可执行路径下的 *.config 文件。
+
+## 测试
+
 ```
 Sample.exe YourYunbaAppkey
 ```
 
-## Clear the uesr's register information
-Remove the *.config file in the executable path.
+## 清除用户的注册信息
+清除可执行路径下的 *.config 文件。
 
-## The basic APIs
+## API 说明
+
 ### CreateClientWithAppkey(string yunbaAppkey)
-Create a client instance using your yunba appkey.
-* yunbaAppkey is a string associated with [YunBa account][2].
+用你的 [Appkey][3] 创建一个客户端实例。
+
+* `yunbaAppkey` 是用户 [在云巴 Portal 创建新应用][4] 后获取到的一串字符。
 
 ```C#
 IMqtt client = MqttClientFactory.CreateClientWithAppkey("YourYunbaAppkey");
 ```
 
 ### Start()
-Start up the client.
+初始化客户端。
 
 ```C#
 client.Start();
 ```
 
 ### Subscribe(string topic, QoS qos)
-Subscribe a topic with a specific Qos level.
-* topic is a string topic to subscribe to.
-* qos is the granted qos level on it.
+订阅一个 [频道][5]。
+
+* `topic` 是待订阅的频道的名称。只支持英文数字下划线，长度不超过 50 个字符。
+* `qos` 是 [QoS][7] 等级，此处的 QoS 暂未实现，请填 QoS.AtLeastOnce。
 
 ```C#
 client.Subscribe("topic_name", QoS.AtLeastOnce);
 ```
 
 ### Unsubscribe(string[] topics)
-Unsubscribe from topics.
-* topics is an array of topics to unsubscribe from.
+取消对某一个或多个 [频道][5] 的订阅。取消订阅后，不会再收到来自该频道的消息。
+
+* `topics` 是待取消的频道数组。
 
 ```C#
 string[] topics = {"topic_name"};
@@ -64,27 +70,30 @@ client.Unsubscribe(topics);
 ```
 
 ### Publish(string topic, MqttPayload payload, QoS qos, bool retained)
-Publish a message to a topic with a specific Qos level.
-* topic is the topic to publish to.
-* payload is the message to publish.
-* qos is the qos level.
-* retained is the retain flag.
+向某频道发布一条消息，并指定 QoS 等级。
+
+* `topic` 是目标频道。只支持英文数字下划线，长度不超过 50 个字符。
+* `payload` 是待发布的消息内容。
+* `qos` 是 [QoS][7] 等级。
+* `retained` 暂未实现，请填 false。
 
 ```C#
 client.Publish("topic_name", "message_content", QoS.AtLeastOnce, false);
 ```
 
 ### SetAlias(string alias)
-Set an alias for the client.
-* alias is a string.
+为客户端设置一个 [别名][6]。
+
+* `alias` 是客户端的 [别名][6]。只支持英文数字下划线，长度不超过 50 个字符。
 
 ```C#
 client.SetAlias("myname");
 ```
 
 ### GetAlias(ExtendedAckArrivedDelegate cb)
-Request the client's alias.
-* cb is the callback function fired when the response arrived.
+获取客户端的 [别名][6]。
+
+* `cb` 是收到回应时调用的回调函数。
 
 ```C#
 client.GetAlias(delegate(object sender, ExtendedAckArrivedArgs e)
@@ -93,20 +102,23 @@ client.GetAlias(delegate(object sender, ExtendedAckArrivedArgs e)
 });
 ```
 
+
 ### PublishToAlias(string alias, MqttPayload payload, QoS qos, bool retained)
-Publish a message to a specific client with alias.
-* alias is a string.
-* payload is the message to publish.
-* qos is the qos level.
-* retained is the retain flag.
+向某个客户端 [别名][6] 发消息。
+
+* `alias` 是客户端的 [别名][6]。只支持英文数字下划线，长度不超过 50 个字符。
+* `payload` 是待发送的消息内容。
+* `qos` 是 [QoS][7] 等级。
+* `retained` 暂未实现，请填 false。
 
 ```C#
 client.PublishToAlias("myname", "message_content", QoS.AtLeastOnce, false);
 ```
 
 ### GetTopicList(ExtendedAckArrivedDelegate cb)
-Request the topics that the client subscribed.
-* cb is the callback function fired when the response arrived.
+获取客户端订阅的 [频道][5] 列表。
+
+* `cb` 是收到回应时调用的回调函数。
 
 ```C#
 client.GetTopicList(delegate(object sender, ExtendedAckArrivedArgs e)
@@ -116,9 +128,10 @@ client.GetTopicList(delegate(object sender, ExtendedAckArrivedArgs e)
 ```
 
 ### GetTopicList(string alias, ExtendedAckArrivedDelegate cb)
-Request the topics that the alias client subscribed.
-* alias is a string.
-* cb is the callback function fired when the response arrived.
+获取客户端订阅的 [频道][5] 列表。
+
+* `alias` 是客户端的 [别名][6]。只支持英文数字下划线，长度不超过 50 个字符。
+* `cb` 是收到回应时调用的回调函数。
 
 ```C#
 client.GetTopicList("peer_name", delegate(object sender, ExtendedAckArrivedArgs e)
@@ -128,9 +141,10 @@ client.GetTopicList("peer_name", delegate(object sender, ExtendedAckArrivedArgs 
 ```
 
 ### GetAliasList(string topic, ExtendedAckArrivedDelegate cb)
-Request a specific topic's alias.
-* topic is the topic to fetch alias list to.
-* cb is the callback function fired when the response arrived.
+获取某 [频道][5] 的所有订阅者的 [别名][6]。
+
+* `topic` 是目标频道。只支持英文数字下划线，长度不超过 50 个字符。
+* `cb` 是收到回应时调用的回调函数。
 
 ```C#
 client.GetAliasList("topic_name", delegate(object sender, ExtendedAckArrivedArgs e)
@@ -140,9 +154,10 @@ client.GetAliasList("topic_name", delegate(object sender, ExtendedAckArrivedArgs
 ```
 
 ### GetState(string alias, ExtendedAckArrivedDelegate cb)
-Request a specific client's state.
-* alias is a string.
-* cb is the callback function fired when the response arrived.
+获取某个客户端的在线状态。
+
+* `alias` 是客户端的 [别名][6]。只支持英文数字下划线，长度不超过 50 个字符。
+* `cb` 是收到回应时调用的回调函数。
 
 ```C#
 client.GetState("peer_name", delegate(object sender, ExtendedAckArrivedArgs e)
@@ -152,12 +167,13 @@ client.GetState("peer_name", delegate(object sender, ExtendedAckArrivedArgs e)
 ```
 
 ### Publish2(string topic, MqttPayload payload, QoS qos, int ttl, string apn_json)
-Publish a message to a topic with some options.
-* topic is the topic to publish to.
-* payload is the message to publish.
-* qos is the qos level.
-* ttl is the time for message will be stored on server, in seconds. If set 0, the message will be forever stored on the server.
-* apn_json is the APN options.
+`Publish2` 是 `publish` 的升级版本，可带更多参数。
+
+* `topic` 是目标频道。只支持英文数字下划线，长度不超过 50 个字符。
+* `payload` 是待发布的消息内容。
+* `qos` 是 [QoS][7] 等级。
+* `ttl` 是消息在服务器上存储的时间，单位是秒（例如，“3600”代表1小时），默认值为 5 天，最大不超过 15 天。
+* `apn_json` 是 APN 选项。
 
 ```C#
 JObject apn_json = new JObject();
@@ -172,20 +188,21 @@ client.Publish2("topic_name", "message_content", QoS.AtLeastOnce, 30, JsonConver
 ```
 
 ### Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json)
-Publish a message to a specific client with alias and some options
-* alias is a string.
-* payload is the message to publish.
-* qos is the qos level.
-* ttl is the time for message will be stored on server, in seconds. If set 0, the message will be forever stored on the server.
-* apn_json is the APN options.
+向某个 [别名][6] 发布消息，可带有部分选项。
+
+* `alias` 是客户端的 [别名][6]。只支持英文数字下划线，长度不超过 50 个字符。
+* `payload` 是待发布的消息内容。
+* `qos` 是 [QoS][7] 等级。
+* `ttl` 是消息在服务器上存储的时间，单位是秒（例如，“3600”代表1小时），默认值为 5 天，最大不超过 15 天。
+* `apn_json` 是 APN 选项。
 
 ```C#
 client.Publish2Alias("peer_name", "message_content", QoS.AtLeastOnce, 0, "");
 ```
 
-## The basic events
+## 事件
 ### Connected
-Fired when a connection is made.
+连接成功建立。
 
 ```C#
 client.Connected += new ConnectionDelegate(client_Connected);
@@ -197,7 +214,7 @@ void client_Connected(object sender, EventArgs e)
 ```
 
 ### ConnectionLost
-Fired when the connection was lost.
+连接断开。
 
 ```C#
 client.ConnectionLost += new ConnectionDelegate(client_ConnectionLost);
@@ -209,7 +226,7 @@ void client_ConnectionLost(object sender, EventArgs e)
 ```
 
 ### PublishArrived
-Fired when a message arrived.
+收到消息。
 
 ```C#
 client.PublishArrived += new PublishArrivedDelegate(client_PublishArrived);
@@ -225,3 +242,8 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 
 [1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net40
 [2]: http://yunba.io/account/
+[3]: https://github.com/yunba/kb/blob/master/AppKey.md
+[4]: https://github.com/yunba/kb/blob/master/Portal.md#%E5%A6%82%E4%BD%95%E5%9C%A8%E4%BA%91%E5%B7%B4-portal-%E4%B8%8A%E5%88%9B%E5%BB%BA%E6%96%B0%E5%BA%94%E7%94%A8
+[5]: https://github.com/yunba/kb/blob/master/%E9%A2%91%E9%81%93%E5%92%8C%E5%88%AB%E5%90%8D.md#%E9%A2%91%E9%81%93topic
+[6]: https://github.com/yunba/kb/blob/master/%E9%A2%91%E9%81%93%E5%92%8C%E5%88%AB%E5%90%8D.md#%E5%88%AB%E5%90%8Dalias
+[7]: https://github.com/yunba/kb/blob/master/QoS.md
