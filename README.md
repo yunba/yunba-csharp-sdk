@@ -7,6 +7,7 @@ http://github.com/stevenlovegrove/MqttDotNet
 
 http://www.doc.ic.ac.uk/~sl203/
 
+***提示*** **.net sdk 默认会把连接信息存在 Mqtt.dll.config 里面，在连接的时候优先读取缓存的信息，避免每次初始化的重新申请以加快速度。在打包之前，请先移除该文件内的登陆信息，这些登陆信息包括：`username`、`password`和`client_id`，均以 K-V 形式存在，sdk 没有找到这些消息的话就会重新去申请登陆信息。**
 
 ## 依赖
 
@@ -19,8 +20,6 @@ http://www.doc.ic.ac.uk/~sl203/
 1. 用 Visual Studio 2013 打开 MqttDotNet.sln 工程文件。
 2. 编译 MqttLib 库
 3. 编译 Sample 工程，进行测试
-
-**提示** 在部署应用之前，请先移除可执行路径下的 *.config 文件。
 
 ## 测试
 
