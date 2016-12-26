@@ -27,6 +27,7 @@ namespace MqttLib
         /// <param name="apn_json">APNS</param>
         /// <returns>Message ID</returns>
         ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json);
+		ulong Publish2ToAliasWithToken(string alias, string token, MqttPayload payload, QoS qos, int ttl, string apn_json);
 
         /// <summary>
         /// Request the client's alias

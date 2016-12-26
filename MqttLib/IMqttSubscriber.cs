@@ -35,6 +35,10 @@ namespace MqttLib
     /// <param name="topics">Topic Name</param>
     /// <returns>Message ID</returns>
     ulong Unsubscribe(string[] topics);
+	ulong SubscribeWithToken(Subscription[] subscriptions, string token);
+	ulong SubscribeWithToken(Subscription subscription, string token);
+	ulong SubscribeWithToken(string topic, string token, QoS qos);
+	ulong UnsubscribeWithToken(string[] topics, string token);
 
     /// <summary>
     /// Fired when the Topic the MQTT client is subscribed to receives a message
