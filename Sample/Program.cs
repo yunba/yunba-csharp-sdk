@@ -170,7 +170,7 @@ namespace Sample
                             Console.Write("The message: ");
                             string m = Console.ReadLine();
 
-                            _client.Publish2(a, m, QoS.AtLeastOnce, 30, "");
+                            _client.Publish2(a, m, QoS.AtLeastOnce, 30, "", "{\"notification_title\":\"ÄãºÃ\", \"notification_content\":\"ÔÆ°ÍÍÆËÍ\"}");
                         }
                         break;
                     case 'c':
@@ -181,7 +181,7 @@ namespace Sample
                             Console.Write("The message: ");
                             string m = Console.ReadLine();
 
-                            _client.Publish2Alias(a, m, QoS.AtLeastOnce, 30, "");
+                            _client.Publish2Alias(a, m, QoS.AtLeastOnce, 30, "", "{\"notification_title\":\"ÄãºÃ\", \"notification_content\":\"ÔÆ°ÍÍÆËÍ\"}");
                         }
                         break;
                     default:

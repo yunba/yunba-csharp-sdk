@@ -32,7 +32,7 @@ namespace MqttLib.Core.Messages
             base.variableHeaderLength = 11 + _payload.Length;
       }
 
-        public MqttExtendedackMessage(ulong msgID, string topic, byte[] payload, QoS qos, int ttl, string apn_json)
+        public MqttExtendedackMessage(ulong msgID, string topic, byte[] payload, QoS qos, int ttl, string apn_json, string third_party_push)
             : base(MessageType.EXTENDEDACK, 8, msgID)
         {
             _commondId = 7;
@@ -62,6 +62,12 @@ namespace MqttLib.Core.Messages
                 pay.WriteByte(7);
                 WriteToStream(pay, apn_json);
             }
+
+			if (third_party_push != null)
+			{
+				pay.WriteByte(8);
+				WriteToStream(pay, third_party_push);
+			}
 
             byte[] paybytes = pay.ToArray();
             if (paybytes.Length <= 65535)

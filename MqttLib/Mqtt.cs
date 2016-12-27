@@ -257,13 +257,13 @@ namespace MqttLib
 			return Publish(parcel.Topic, parcel.Payload, parcel.Qos, parcel.Retained);
 		}
 
-		public ulong Publish2(string topic, MqttPayload payload, QoS qos, int ttl, string apn_json)
+		public ulong Publish2(string topic, MqttPayload payload, QoS qos, int ttl, string apn_json, string third_party_push)
 		{
 			if (manager.IsConnected)
 			{
 				ulong messID = MessageID;
 
-				manager.SendMessage(new MqttExtendedackMessage(messID, topic, payload.TrimmedBuffer, qos, ttl, apn_json));
+				manager.SendMessage(new MqttExtendedackMessage(messID, topic, payload.TrimmedBuffer, qos, ttl, apn_json, third_party_push));
 				return messID;
 			}
 			else
@@ -277,9 +277,9 @@ namespace MqttLib
 			return Publish(",yta/" + alias, payload, qos, retained);
 		}
 
-		public ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json)
+		public ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json, string third_party_push)
 		{
-			return Publish2(",yta/" + alias, payload, qos, ttl, apn_json);
+			return Publish2(",yta/" + alias, payload, qos, ttl, apn_json, third_party_push);
 		}
 
 		public ulong Subscribe(Subscription[] subscriptions)

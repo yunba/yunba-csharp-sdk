@@ -15,7 +15,7 @@ namespace MqttLib
         /// <param name="ttl">Time for message will be stored on server, in seconds. If set 0, the message will be forever on the server.</param>
         /// <param name="apn_json">APNS</param>
         /// <returns>Message ID</returns>
-        ulong Publish2(string topic, MqttPayload payload, QoS qos, int ttl, string apn_json);
+        ulong Publish2(string topic, MqttPayload payload, QoS qos, int ttl, string apn_json, string third_party_push);
 
         /// <summary>
         /// Publish a message to a specific client with alias and some options
@@ -26,8 +26,8 @@ namespace MqttLib
         /// <param name="ttl">Time for message will be stored on server, in seconds. If set 0, the message will be forever on the server.</param>
         /// <param name="apn_json">APNS</param>
         /// <returns>Message ID</returns>
-        ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json);
-		ulong Publish2ToAliasWithToken(string alias, string token, MqttPayload payload, QoS qos, int ttl, string apn_json);
+        ulong Publish2Alias(string alias, MqttPayload payload, QoS qos, int ttl, string apn_json, string third_party_push);
+		ulong Publish2ToAliasWithToken(string alias, string token, MqttPayload payload, QoS qos, int ttl, string apn_json, string third_party_push);
 
         /// <summary>
         /// Request the client's alias
