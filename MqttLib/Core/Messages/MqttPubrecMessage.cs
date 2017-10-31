@@ -21,13 +21,13 @@ namespace MqttLib.Core.Messages
         {
             _ackID = ackID;
             // Ensure that this message will be re-sent unless acknowledged
-            msgQos = QoS.AtLeastOnce;
+            msgQos = QoS.BestEfforts;
         }
 
         public MqttPubrecMessage(Stream str, byte header) : base(str, header)
         {
             // Ensure that this message can get resent in the event of failure
-            this.msgQos = QoS.AtLeastOnce;
+            this.msgQos = QoS.BestEfforts;
         }
 
         protected override void ConstructFromStream(System.IO.Stream str)
