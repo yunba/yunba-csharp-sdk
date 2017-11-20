@@ -239,6 +239,8 @@ bool client_PublishArrived(object sender, PublishArrivedArgs e)
 }
 ```
 
+**声明：对于自行修改 sdk 而导致的问题，云巴恕不提供技术支持。如果对于 sdk 有个性化需求，可以联系商务定制开发：xieting@yunba.io**
+
 [1]: https://github.com/yunba/yunba-csharp-sdk/tree/master/packages/Newtonsoft.Json.6.0.4/lib/net40
 [2]: http://yunba.io/account/
 [3]: https://github.com/yunba/kb/blob/master/AppKey.md
