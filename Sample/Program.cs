@@ -11,6 +11,24 @@ namespace Sample
 {
 	class Program
 	{
+        static void print_help_msg()
+        {
+            Console.WriteLine("The available commands(press 'q' to exits): ");
+            Console.WriteLine("1. get the client's alias");
+            Console.WriteLine("2. get the client's topics");
+            Console.WriteLine("3. get a specific client's topics");
+            Console.WriteLine("4. get a specific topic's alias list");
+            Console.WriteLine("5. get a specific client's state");
+            Console.WriteLine("6. set the client's alias");
+            Console.WriteLine("7. subscribe the topic");
+            Console.WriteLine("8. unsubscribe the topic");
+            Console.WriteLine("9. publish message");
+            Console.WriteLine("a. publish message to alias");
+            Console.WriteLine("b. publish2 message");
+            Console.WriteLine("c. publish2 message to alias");
+            Console.WriteLine("h. print this help msg");
+            Console.WriteLine();
+        }
 		static void Main(string[] args)
 		{
 			if (args.Length != 1)
@@ -27,20 +45,8 @@ namespace Sample
             Console.WriteLine("Press any key to continue ...");
             Console.ReadKey();
 
-            Console.WriteLine("The available commands(press 'q' to exits): ");
-            Console.WriteLine("1. get the client's alias");
-            Console.WriteLine("2. get the client's topics");
-            Console.WriteLine("3. get a specific client's topics");
-            Console.WriteLine("4. get a specific topic's alias list");
-            Console.WriteLine("5. get a specific client's state");
-            Console.WriteLine("6. set the client's alias");
-            Console.WriteLine("7. subscribe the topic");
-            Console.WriteLine("8. unsubscribe the topic");
-            Console.WriteLine("9. publish message");
-            Console.WriteLine("a. publish message to alias");
-            Console.WriteLine("b. publish2 message");
-            Console.WriteLine("c. publish2 message to alias");
-            Console.WriteLine();
+
+            print_help_msg();
 
             Console.Write("Enter the commond id: ");
 
@@ -51,6 +57,11 @@ namespace Sample
 
                 switch (input)
                 {
+                    case 'h':
+                        {
+                            print_help_msg();
+                            break;
+                        }
                     case '1':
                         {
                             Console.WriteLine("Getting Alias...");
