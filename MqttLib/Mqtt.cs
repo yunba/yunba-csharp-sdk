@@ -27,6 +27,7 @@ namespace MqttLib
 
         private TopicTree<PublishArrivedDelegate> topicTree = null;
 
+        private bool _is_waiting_ping_resp = false;
         private string _clientID;
         private string _username;
         private string _password;
@@ -93,7 +94,17 @@ namespace MqttLib
         {
             try
             {
-                manager.SendMessage(new MqttPingReqMessage());
+                if(_is_waiting_ping_resp)
+                {
+                    //didn't receive a resp in a heartbeat, connection might be lost
+                    OnConnectionLost(new EventArgs());
+                }
+                else
+                {
+                    manager.SendMessage(new MqttPingReqMessage());
+                    _is_waiting_ping_resp = true;
+                }
+               
             }
             catch (Exception e)
             {
@@ -158,6 +169,7 @@ namespace MqttLib
                         OnExtendedAckArrived(new ExtendedAckArrivedArgs(mm.AckID, mm.CommondId, mm.Status, mm.Payload));
                     break;
                 case MessageType.PINGRESP:
+                    _is_waiting_ping_resp = false;
                     break;
                 case MessageType.UNSUBSCRIBE:
                 case MessageType.CONNECT:
@@ -236,14 +248,17 @@ namespace MqttLib
         {
             if (manager.IsConnected)
             {
-                // Reset the PINGREQ timer as this publish will reset the server's counter
+                
+                ulong messID = MessageID;
+                manager.SendMessage(new MqttPublishMessage(messID, topic, payload.TrimmedBuffer, qos, retained));
+                // Reset the PINGREQ timer after the message is sent
+                // as this publish will reset the server's counter.
+                // But don't reset it before you successfully send this msgs
                 if (keepAliveTimer != null)
                 {
                     int kmillis = 1000 * _keepAlive;
                     keepAliveTimer.Change(kmillis, kmillis);
                 }
-                ulong messID = MessageID;
-                manager.SendMessage(new MqttPublishMessage(messID, topic, payload.TrimmedBuffer, qos, retained));
                 return messID;
             }
             else
@@ -431,7 +446,7 @@ namespace MqttLib
                     }
                 }
             }
-
+            
             if (m.QualityOfService > QoS.BestEfforts)
             {
                 qosManager.PublishAccepted(m.MessageID, accepted);
@@ -529,6 +544,8 @@ namespace MqttLib
 
         protected void OnConnected(EventArgs e)
         {
+            //reset waiting ping falg when connect is done
+            _is_waiting_ping_resp = false;
             if (Connected != null)
             {
                 try
