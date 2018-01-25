@@ -30,4 +30,15 @@ namespace MqttLib.Core
         public UnsupportedProtocolException(string message) : base(message) { }
 
     }
+
+    /// <summary>
+    /// Thrown when the connection is disconnected
+    /// </summary>
+    public class DisconnectException : Exception
+    {
+        public DisconnectException() { }
+
+        public DisconnectException(string message) : base(message) { }
+
+    }
 }

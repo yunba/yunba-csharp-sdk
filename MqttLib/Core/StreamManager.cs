@@ -88,16 +88,26 @@ namespace MqttLib.Core
         private void listen(IAsyncResult asyncResult)
         {
           if (_closing) return;
-
+          
           // Invalidate readOp Object to signify processing in this method
           readOp = null;
 
           try
           {
-            _channel.EndRead(asyncResult);
-            MqttMessage msg = MessageFactory.CreateMessage(_channel, headerBuffer[0]);
-            qosManager.ProcessReceivedMessage(msg);
-            readOp = _channel.BeginRead(headerBuffer, 0, 1, callback, null);
+              //there is not protocol id 0, so if you get a header zero, there must be a disconnect
+                  if (headerBuffer[0] == 0)
+                  {
+                      throw new DisconnectException("disconnect");
+                  }
+                _channel.EndRead(asyncResult);
+
+                MqttMessage msg = MessageFactory.CreateMessage(_channel, headerBuffer[0]);
+                qosManager.ProcessReceivedMessage(msg);
+
+                //clean up the header
+                headerBuffer[0] = 0;
+                readOp = _channel.BeginRead(headerBuffer, 0, 1, callback, null);
+
           }
           catch (Exception e)
           {
