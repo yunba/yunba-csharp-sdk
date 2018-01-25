@@ -37,6 +37,7 @@ namespace MqttLib.Core
         public void Connect()
         {
             _channel = StreamFactory.CreateStream(_connString);
+            headerBuffer[0] = 0;
             readOp = _channel.BeginRead(headerBuffer, 0, 1, callback, null);
             // Give the qosManager a handle to the streams
             qosManager.SetStreamManager(this);

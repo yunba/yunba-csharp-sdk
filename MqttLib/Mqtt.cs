@@ -84,6 +84,7 @@ namespace MqttLib
 
         void Mqtt_ConnectionLost(object sender, EventArgs e)
         {
+            Log.Write(LogLevel.ERROR, e.ToString());
             extendAckCallBacks.Clear();
 
             if (!isActiveStop)
